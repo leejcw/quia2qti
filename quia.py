@@ -11,16 +11,26 @@ def html_to_json(filename, verbose=False):
     for form in forms:
         if form.attrs.get("name") != "quiaForm":
             continue
+
         inputs = form.find_all("input")
         title = ""
         for _input in inputs:
             if _input.attrs.get("name") == "title":
                 title = _input.attrs.get("value")
                 break
+            
+        descs = form.find_all("textarea")
+        desc = ""
+        for _desc in descs:
+            if _desc.attrs.get("name") == "desc":
+                desc = _desc.text
+                break
+
         placeholders = form.find_all("table", id="insertDataBlockTblId")
         # Extra table at the end to sum up points.
         questions = [p.find_next("table") for p in placeholders[:-1]]
-        results = {"title": title, "items": [extract(q) for q in questions]}
+        results = {"title": title, "description": desc, "items": [extract(q) for q in questions]}
+        break
 
     if verbose:
         print(results["title"])
@@ -41,10 +51,11 @@ def extract(question):
     ch3 = [x for x in ch2[0].children if x.text.strip()]
     # ch3[0] is the Switch to edit mode/Remove button
     ch4 = [x for x in ch3[1].children if x.text.strip()]
-    text, options = get_q_and_a(ch4[0])
+    text, images, options = get_q_and_a(ch4[0])
     ans, corr, incorr = get_explanations(ch4[1], options)
     return dict(
         question=text,
+        images=images,
         choices=options,
         correct_answer=ans,
         correct_explanation=corr,
@@ -55,12 +66,15 @@ def extract(question):
 def get_q_and_a(question):
     # Unwrapping the table
     q = [question]
-    for _ in range(4):
+    for _ in range(3):
         q = [x for x in q[0].children if x.text.strip()]
+    # Assumes there are only images in the question.
+    images = [x.attrs["src"] for x in q[0].find_all("img")]
+    q = [x for x in q[0].children if x.text.strip()]
     boxes = [x for x in q if x.text.strip()]
     text = boxes[0].text.strip()
     options =  [x.text.strip() for x in boxes[1].find_all("td")][1::2]
-    return text, options
+    return text, images, options
 
 
 def get_explanations(expl, options):
@@ -80,6 +94,8 @@ def get_explanations(expl, options):
         if o == ans_text:
             ans = i
             break
-    corr = [x.text for x in e[1] if x.text.strip()][1]
-    incorr = [x.text for x in e[2] if x.text.strip()][1]
+    corr = [x.text for x in e[1] if x.text.strip()]
+    corr = corr[1] if len(corr) > 1 else ""
+    incorr = [x.text for x in e[2] if x.text.strip()]
+    incorr = incorr[1] if len(incorr) > 1 else ""
     return ans, corr, incorr
