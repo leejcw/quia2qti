@@ -5,7 +5,14 @@ def transform(assessment):
         markdown += f"Quiz description: {desc_str}\n"
     markdown += "\n"
 
-    for i, item in enumerate(assessment["items"], start=1):
+    i = 0
+    seen_questions = set()
+    for item in assessment["items"]:
+        question = item["question"]
+        if question in seen_questions:
+            continue
+        i += 1
+        seen_questions.add(question)
         answer = item["correct_answer"]
         correct = item["correct_explanation"]
         incorrect = item["incorrect_explanation"]
