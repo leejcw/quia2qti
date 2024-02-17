@@ -72,8 +72,15 @@ def get_q_and_a(question):
     images = [x.attrs["src"] for x in q[0].find_all("img")]
     q = [x for x in q[0].children if x.text.strip()]
     boxes = [x for x in q if x.text.strip()]
-    text = boxes[0].text.strip()
-    options =  [x.text.strip() for x in boxes[1].find_all("td")][1::2]
+    text = ""
+    i = 0
+    while i < len(boxes):
+        if not "find_all" in dir(boxes[i]):
+            text += boxes[i].text.strip()
+        else:
+            break
+        i += 1
+    options =  [x.text.strip() for x in boxes[i].find_all("td")][1::2]
     return text, images, options
 
 

@@ -4,7 +4,8 @@ def transform(assessment):
     if desc_str:
         markdown += f"Quiz description: {desc_str}\n"
     markdown += "\n"
-    for i, item in enumerate(assessment["items"]):
+
+    for i, item in enumerate(assessment["items"], start=1):
         answer = item["correct_answer"]
         correct = item["correct_explanation"]
         incorrect = item["incorrect_explanation"]

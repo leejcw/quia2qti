@@ -44,7 +44,7 @@ def main():
             except Exception:
                 print(f"Failed to extract {f}\n", traceback.format_exc())
                 continue
-            process_assessment(f, extracted, args)
+            process_assessment(f[:-5], extracted, args)
 
 
 def process_assessment(file_path, extracted_assessment, args):
