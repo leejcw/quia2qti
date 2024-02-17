@@ -76,6 +76,8 @@ def get_q_and_a(question):
     i = 0
     while i < len(boxes):
         if not "find_all" in dir(boxes[i]):
+            if i != 0:
+                text += " "
             text += boxes[i].text.strip()
         else:
             break
