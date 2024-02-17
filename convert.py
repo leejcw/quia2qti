@@ -36,7 +36,7 @@ def main():
     if args.dir:
         html_files = []
         for path, _, files in os.walk(args.dir):
-            html_files.extend([os.path.join(path, f) for f in files if f.endswith(".html") and not f.endswith("saved_resource.html")])
+            html_files.extend([os.path.join(path, f) for f in files if f.endswith(".html") and "saved_resource" not in f])
 
         for f in tqdm.tqdm(html_files):
             try:
@@ -56,9 +56,10 @@ def process_assessment(file_path, extracted_assessment, args):
         f.write(md.transform(extracted_assessment))
 
     try:
+        # Add ~/Library/Python/3.8/bin to PATH
         subprocess.check_call(["text2qti", file_path + ".md"])
-    except:
-        print(f"Failed to convert {file_path}.html to QTI")
+    except Exception:
+        print(f"Failed to convert {file_path}.html to QTI\n{traceback.format_exc()}")
 
     if not args.debug_markdown:
         os.remove(file_path + ".md")

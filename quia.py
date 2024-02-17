@@ -15,6 +15,8 @@ def html_to_json(filename, verbose=False):
         inputs = form.find_all("input")
         title = ""
         for _input in inputs:
+            if _input.attrs.get("name") == "tagSubmitSaveForLater":
+                raise Exception("Quiz has errors. Please fix before converting.")
             if _input.attrs.get("name") == "title":
                 title = _input.attrs.get("value")
                 break
@@ -82,7 +84,10 @@ def get_q_and_a(question):
         else:
             break
         i += 1
-    options =  [x.text.strip() for x in boxes[i].find_all("td")][1::2]
+    if i < len(boxes):
+        options =  [x.text.strip() for x in boxes[i].find_all("td")][1::2]
+    else:
+        options = []  # short answer
     return text, images, options
 
 
@@ -96,13 +101,23 @@ def get_explanations(expl, options):
             continue
         if "Correct answer:" in ans_child.text:
             continue
+        if "Correct answers:" in ans_child.text:
+            continue
         ans_text = ans_child.text.strip()
         break
-    ans = -1
-    for i, o in enumerate(options):
-        if o == ans_text:
-            ans = i
-            break
+    if options:
+        # multiple choice
+        ans = -1
+        for i, o in enumerate(options):
+            if o == ans_text:
+                ans = i
+                break
+    else:
+        # short answer
+        if "• " in ans_text:
+            ans = ans_text.split("• ")[1:]
+        else:
+            ans = [ans_text]
     corr = ""
     incorr = ""
     if len(e) > 1:

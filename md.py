@@ -14,6 +14,7 @@ def transform(assessment):
         i += 1
         seen_questions.add(question)
         answer = item["correct_answer"]
+        choices = item["choices"]
         correct = item["correct_explanation"]
         incorrect = item["incorrect_explanation"]
         markdown += f"Title: Question {i}\nPoints: 1\n"
@@ -28,8 +29,11 @@ def transform(assessment):
                 markdown += f"+   {correct}\n"
             if incorrect:
                 markdown += f"-   {incorrect}\n"
-        char = 97
-        for j, choice in enumerate(item["choices"]):
-            markdown += f"{'*' if j == answer else ''}{chr(char + j)}) {choice}\n"
+        if choices:
+            for j, choice in enumerate(choices):
+                markdown += f"{'*' if j == answer else ''}{chr(97 + j)}) {choice}\n"
+        else:
+            for ans in answer:
+                markdown += f"*   {ans}\n"
         markdown += "\n"
     return markdown
