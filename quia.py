@@ -101,8 +101,14 @@ def get_explanations(expl, options):
         if o == ans_text:
             ans = i
             break
-    corr = [x.text for x in e[1] if x.text.strip()]
-    corr = corr[1] if len(corr) > 1 else ""
-    incorr = [x.text for x in e[2] if x.text.strip()]
-    incorr = incorr[1] if len(incorr) > 1 else ""
+    corr = ""
+    incorr = ""
+    if len(e) > 1:
+        _corr = [x.text for x in e[1] if x.text.strip()]
+        if len(_corr) > 1:
+            corr = _corr[1]
+    if len(e) > 2:
+        _incorr = [x.text for x in e[2] if x.text.strip()]
+        if len(_incorr) > 1:
+            incorr = _incorr[1]
     return ans, corr, incorr

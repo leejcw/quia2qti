@@ -21,7 +21,7 @@ def transform(assessment):
         for image in item["images"]:
             markdown += f"<br>![alt_text]({image})"
         markdown += "\n"
-        if correct == incorrect:
+        if correct and correct == incorrect:
             markdown += f"... {correct}\n"
         else:
             if correct:
