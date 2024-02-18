@@ -1,8 +1,8 @@
 import json
 import os
 import zipfile
-from xml.etree.ElementTree import Element, SubElement, tostring
 from xml.dom.minidom import parseString
+from xml.etree.ElementTree import Element, SubElement, tostring
 
 
 def create_qti_xml(data):
@@ -19,24 +19,13 @@ def create_qti_xml(data):
     assessment = SubElement(
         root,
         "assessment",
-        {
-            "title": data["title"]
-        },
+        {"title": data["title"]},
     )
 
     # Number of attempts
-    qtimetadata = SubElement(
-        assessment,
-        "qtimetadata"
-    )
-    qtimetadatafield = SubElement(
-        qtimetadata,
-        "qtimetadatafield"
-    )
-    attempts_field = SubElement(
-        qtimetadatafield,
-        "fieldlabel"
-    )
+    qtimetadata = SubElement(assessment, "qtimetadata")
+    qtimetadatafield = SubElement(qtimetadata, "qtimetadatafield")
+    attempts_field = SubElement(qtimetadatafield, "fieldlabel")
     attempts_field.text = "cc_maxattempts"
     attempts_entry = SubElement(
         qtimetadatafield,
@@ -60,27 +49,25 @@ def create_qti_xml(data):
                 "title": "Question",
             },
         )
-        itemmetadata = SubElement(
-            question,
-            "itemmetadata"
-        )
+        itemmetadata = SubElement(question, "itemmetadata")
         for field, entry in [
-                ("question_type", "multiple_choice_question"),
-                ("points_possible", "1.0"),
-                ("original_answer_ids", ",".join([str(x) for x in range(response_label, response_label + len(item["choices"]))]))
+            ("question_type", "multiple_choice_question"),
+            ("points_possible", "1.0"),
+            (
+                "original_answer_ids",
+                ",".join(
+                    [
+                        str(x)
+                        for x in range(
+                            response_label, response_label + len(item["choices"])
+                        )
+                    ]
+                ),
+            ),
         ]:
-            qtimetadata = SubElement(
-                itemmetadata,
-                "qtimetadata"
-            )
-            qtimetadatafield = SubElement(
-                qtimetadata,
-                "qtimetadatafield"
-            )
-            _field = SubElement(
-                qtimetadatafield,
-                "fieldlabel"
-            )
+            qtimetadata = SubElement(itemmetadata, "qtimetadata")
+            qtimetadatafield = SubElement(qtimetadata, "qtimetadatafield")
+            _field = SubElement(qtimetadatafield, "fieldlabel")
             _field.text = field
             _entry = SubElement(
                 qtimetadatafield,
@@ -89,68 +76,27 @@ def create_qti_xml(data):
             _entry.text = entry
 
         # Presentation
-        presentation = SubElement(
-            question,
-            "presentation"
-        )
-        material = SubElement(
-            presentation,
-            "material"
-        )
-        mattext = SubElement(
-            material,
-            "mattext",
-            {
-                "texttype": "text/plain"
-            }
-        )
+        presentation = SubElement(question, "presentation")
+        material = SubElement(presentation, "material")
+        mattext = SubElement(material, "mattext", {"texttype": "text/plain"})
         mattext.text = item["question"]
 
         response_lid = SubElement(
-            presentation,
-            "response_lid",
-            {
-                "rcardinality": "Single"
-            }
+            presentation, "response_lid", {"rcardinality": "Single"}
         )
-        render_choice = SubElement(
-            response_lid,
-            "render_choice"
-        )
+        render_choice = SubElement(response_lid, "render_choice")
         for i, choice in enumerate(item["choices"]):
             response_lab = SubElement(
-                render_choice,
-                "response_label",
-                {
-                    "ident": str(response_label + i)
-                }
+                render_choice, "response_label", {"ident": str(response_label + i)}
             )
-            material = SubElement(
-                response_lab,
-                "material"
-            )
-            mattext = SubElement(
-                material,
-                "mattext",
-                {
-                    "texttype": "text/plain"
-                }
-            )
+            material = SubElement(response_lab, "material")
+            mattext = SubElement(material, "mattext", {"texttype": "text/plain"})
             mattext.text = choice
 
         # Results
-        resprocessing = SubElement(
-            question,
-            "resprocessing"
-        )
+        resprocessing = SubElement(question, "resprocessing")
         # TODO: outcomes
-        respcondition = SubElement(
-            question,
-            "respcondition",
-            {
-                "continue": "No"
-            }
-        )
+        respcondition = SubElement(question, "respcondition", {"continue": "No"})
         # TODO
         answer_id = item["correct_answer"] + response_label
         response_label += len(item["choices"])

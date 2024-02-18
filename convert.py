@@ -3,12 +3,13 @@ import json
 import os
 import pathlib
 import subprocess
-import tqdm
 import traceback
 
+import tqdm
+
 import md
-import quia
 import qti
+import quia
 
 
 def main():
@@ -16,10 +17,16 @@ def main():
     group = parser.add_mutually_exclusive_group()
     group.add_argument("-f", "--file", type=str, help="Quia HTML file")
     group.add_argument("-d", "--dir", type=str, help="Directory of Quia HTML files")
-    
-    parser.add_argument("--debug_json", action="store_true", help="Save the intermediate json")
-    parser.add_argument("--debug_markdown", action="store_true", help="Save the intermediate markdown")
-    parser.add_argument("-v", "--verbose", action="store_true", help="Print the parsed assessments")
+
+    parser.add_argument(
+        "--debug_json", action="store_true", help="Save the intermediate json"
+    )
+    parser.add_argument(
+        "--debug_markdown", action="store_true", help="Save the intermediate markdown"
+    )
+    parser.add_argument(
+        "-v", "--verbose", action="store_true", help="Print the parsed assessments"
+    )
     args = parser.parse_args()
 
     assert args.file or args.dir, "Input files must be provided"
@@ -36,7 +43,13 @@ def main():
     if args.dir:
         html_files = []
         for path, _, files in os.walk(args.dir):
-            html_files.extend([os.path.join(path, f) for f in files if f.endswith(".html") and "saved_resource" not in f])
+            html_files.extend(
+                [
+                    os.path.join(path, f)
+                    for f in files
+                    if f.endswith(".html") and "saved_resource" not in f
+                ]
+            )
 
         for f in tqdm.tqdm(html_files):
             try:
