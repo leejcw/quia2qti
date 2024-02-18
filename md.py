@@ -30,8 +30,12 @@ def transform(assessment):
             if incorrect:
                 markdown += f"-   {incorrect}\n"
         if choices:
-            for j, choice in enumerate(choices):
-                markdown += f"{'*' if j == answer else ''}{chr(97 + j)}) {choice}\n"
+            if isinstance(answer, int):
+                for j, choice in enumerate(choices):
+                    markdown += f"{'*' if j == answer else ''}{chr(97 + j)}) {choice}\n"
+            else:
+                for j, choice in enumerate(choices):
+                    markdown += f"[{'*' if j in answer else ' '}] {choice}\n"
         else:
             for ans in answer:
                 markdown += f"*   {ans}\n"

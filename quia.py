@@ -151,12 +151,20 @@ def get_explanations(expl, options):
         ans_text = ans_child.text.strip()
         break
     if options:
-        # multiple choice
+        # single choice
         ans = -1
         for i, o in enumerate(options):
             if o == ans_text:
                 ans = i
                 break
+        # multiple choice
+        if ans == -1:
+            ans = []
+            accept = ans_text.split("• ")[1:]
+            for i, o in enumerate(options):
+                for acc in accept:
+                    if o == acc:
+                        ans.append(i)
     else:
         # short answer
         if "• " in ans_text:
